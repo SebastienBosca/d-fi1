@@ -94,10 +94,10 @@ function RegisterVote(uint PropId) public {
     require (profil[msg.sender].isRegistered == true, "vous ne pouvez soumettre votre vote car vous n'etes pas enregistre en tant que votant");
     require (status == WorkflowStatus.VotingSessionStarted , "la phase d'enregistrement des votes est terminee ou n'a pas commence");  
     ++propositions[PropId-1].voteCount;  // je suppose que tableau[0] est le 1er élément du tableau, d'ou le -1
-    if (propositions[PropId-1].voteCount == Max) { // si 
+    if (propositions[PropId-1].voteCount == Max) { // si la proposition est l'une de celles qui ont le max de voix, on la rajoute dans le tableau des gagnants
     winners.push(PropId) ;
     }
-    if (propositions[PropId-1].voteCount > Max) {
+    if (propositions[PropId-1].voteCount > Max) { // si la proposition obtient plus de voix que les autres on efface les gagnants et on rajoute la proposition dans les gagnants
     delete winners ;   
     Max = propositions[PropId-1].voteCount ;
     winners.push(PropId) ;
