@@ -3,10 +3,9 @@
 
 pragma solidity 0.8.11;
  
-import "./ownable.sol";  // ou sinon import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol" 
-// j'ai mis ./ et non ../ car sur Remix les 2 contrats sont au même niveau
+import "./ownable.sol";  /* ou sinon import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol" */
  
-contract Voting {
+contract Voting is Ownable {
 
 struct Voter {
 bool isRegistered;
@@ -38,17 +37,16 @@ event Voted (address voter, uint proposalId);
 
 
 uint NombreProp; 
-address _owner; // ? ça met des erreurs sinon, pourtant _owner est déclaré dans ownable.sol ?
 uint Max;
 uint[] private winners;
 uint[] public Winners;
 
-// Etape 0: l'administrateur peut modifier le statut
+// Etape 0: l'administrateur (et lui seul) peut modifier le statut
 
 WorkflowStatus status;
 
-function changeStatus(WorkflowStatus newStatus) public { // ? pourquoi pas avec un "return" ? Pourquoi erreur si on rajoute view ?
-    require (msg.sender == _owner, "Seul l'administrateur peut modifier le statut"); 
+function changeStatus(WorkflowStatus newStatus) public { // ou public onlyOwner { et on supprime la ligne suivante mais alors le message est celui specifie dans Ownable
+    require (msg.sender == owner(), "Seul l'administrateur peut modifier le statut"); 
     emit WorkflowStatusChange(status, newStatus);
     if (newStatus == WorkflowStatus.ProposalsRegistrationStarted) {
         NombreProp = 0;
@@ -62,13 +60,13 @@ function changeStatus(WorkflowStatus newStatus) public { // ? pourquoi pas avec 
         Winners = winners ;
     }
 
-    status=newStatus; // et non pas status=workflowStatus.newstatus ?
+    status=newStatus; 
 }
 
 // Etape 1: Enregistrement des votants
 
-function Register(address voterAddress) public  {
-    require (msg.sender == _owner, "seul l'administrateur peut enregistrer un votant");
+function Register(address voterAddress) public  { // ou public onlyOwner { et on supprime la ligne suivante
+    require (msg.sender == owner(), "seul l'administrateur peut enregistrer un votant");
     require (status == WorkflowStatus.RegisteringVoters , "la phase d'enregistrement est terminee ou n'a pas commence"); // heu on ne peut pas mettre d'accent dans les strings 
     profil[voterAddress].isRegistered = true;
     emit VoterRegistered(voterAddress);
@@ -76,7 +74,7 @@ function Register(address voterAddress) public  {
 
 // Etape 2: Enregistrement des Propositions 
 
-function RegisterProposal(string memory prop) public { // plein d'erreurs si on met view
+function RegisterProposal(string memory prop) public {  
     require (profil[msg.sender].isRegistered == true, "vous ne pouvez soumettre votre proposition car vous n'etes pas enregistre en tant que votant");
     require (status == WorkflowStatus.ProposalsRegistrationStarted , "la phase d'enregistrement des propositions est terminee ou n'a pas commence");  
     ++ NombreProp ; // ? NombreProp +=1 marcherait ou pas ? : a++ and a-- are equivalent to a += 1 / a -= 1 but the expression itself still has the previous value of a
@@ -94,11 +92,11 @@ function RegisterVote(uint PropId) public {
     require (profil[msg.sender].isRegistered == true, "vous ne pouvez soumettre votre vote car vous n'etes pas enregistre en tant que votant");
     require (status == WorkflowStatus.VotingSessionStarted , "la phase d'enregistrement des votes est terminee ou n'a pas commence");  
     ++propositions[PropId-1].voteCount;  // je suppose que tableau[0] est le 1er élément du tableau, d'ou le -1
-    if (propositions[PropId-1].voteCount == Max) { // si la proposition est l'une de celles qui ont le max de voix, on la rajoute dans le tableau des gagnants
+    if (propositions[PropId-1].voteCount == Max) {
     winners.push(PropId) ;
     }
-    if (propositions[PropId-1].voteCount > Max) { // si la proposition obtient plus de voix que les autres on efface les gagnants et on rajoute la proposition dans les gagnants
-    delete winners ;   
+    if (propositions[PropId-1].voteCount > Max) {
+    delete winners ;  
     Max = propositions[PropId-1].voteCount ;
     winners.push(PropId) ;
     }
@@ -113,7 +111,7 @@ function RegisterVote(uint PropId) public {
 
 // Etape 6: Comptabilisation des votes et publication du ou des gagnants
 
-function getWinner() public returns (uint[] memory) {  // il y a un warning que je ne comprends pas
+function getWinner() public view returns (uint[] memory) {  // il y a un warning que je ne comprends pas
     require (status == WorkflowStatus.VotesTallied , "le vote n'est pas termine");  
     return Winners ; 
 }
