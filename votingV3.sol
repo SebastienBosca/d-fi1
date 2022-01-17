@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 
 // j'ai préféré calculer le ou les gagnants au fur et à mesure mais on peut aussi lancer un calcul avec une boucle type FOR à la fin.
-// Pour moi Winners est un tableau d'entiers car il peut y avoir plusieurs gagnants.
+// Winners est un tableau d'entiers car il peut y avoir plusieurs gagnants.
 
 pragma solidity 0.8.11;
  
-import "./ownable.sol";  /* ou sinon import "https://github.com/OpenZeppelin/openzeppelin-contracts/contracts/access/Ownable.sol" */
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/contracts/access/Ownable.sol";
  
 contract Voting is Ownable {
 
@@ -31,7 +31,7 @@ VotesTallied
 
 WorkflowStatus public status = WorkflowStatus.VotesTallied ;
 
-mapping (address => Voter) public profil; // mettre private si on ne veut pas que les votes soient publics; 
+mapping (address => Voter) public profil; // mettre private si on ne veut pas que les votes soient publics, y compris ci-dessous.
 Proposal[] public propositions;
 
 event VoterRegistered(address voterAddress); 
