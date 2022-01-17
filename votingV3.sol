@@ -56,10 +56,10 @@ function changeStatus(WorkflowStatus newStatus) public { // ou public onlyOwner 
         delete propositions;
         Max = 0;
         delete winners ;
-        delete Winners ;
+        delete Winners ; // on efface les propositions et les gagnants au début de la procédure.
     }
     if (newStatus == WorkflowStatus.VotesTallied) {
-        Winners = winners ;
+        Winners = winners ; // on publie les résultats.
     }
 
     status = newStatus; 
