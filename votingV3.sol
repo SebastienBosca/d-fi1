@@ -42,7 +42,7 @@ event Voted (address voter, uint proposalId);
 
 uint NombreProp; 
 uint Max;
-uint[] private winners; //le gagnant ne s'affiche qu'à la fin, cependant le tableau public "propositions" permet à tout moment de connaître le nombre de voix d'une proposition; ce choix est évidemment discutable et modifiable.
+uint[] private winners; //le gagnant ne s'affiche qu'à la fin, cependant le tableau public "propositions" et le mapping "profil" permettent à tout moment de connaître le nombre de voix d'une proposition; ce choix est évidemment discutable et modifiable.
 uint[] public Winners;
 
 // Etape 0: l'administrateur (et lui seul) peut modifier le statut
